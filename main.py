@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 
 app = Flask(__name__)
@@ -21,7 +21,13 @@ def create_admin():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    user_id = session.get('user_id')
+    user = User.query.get(user_id) if user_id else None
+    return render_template('index.html', current_user=user)
+
+@app.route('/home')
+def home():
+    return redirect(url_for('index'))
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -38,7 +44,8 @@ def signup():
         db.session.add(user)
         db.session.commit()
 
-        return redirect(url_for('index'))
+        flash('Signup successful! Please login to continue.', 'success')
+        return redirect(url_for('login'))
 
     return render_template('signup.html')
 
@@ -52,9 +59,11 @@ def login():
         user = User.query.filter_by(email=email, password=password).first()
         if user:
             session['user_id'] = user.id
+            flash('Login successful!', 'success')
             return redirect(url_for('index'))
         else:
-            return render_template('login.html', message='Invalid email or password')
+            flash('Invalid email or password', 'error')
+            return render_template('login.html')
     return render_template('login.html')
 
 
@@ -75,4 +84,3 @@ if __name__ == '__main__':
 
     
     app.run(debug=True)
-    

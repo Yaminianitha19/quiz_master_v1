@@ -13,6 +13,7 @@ class User(db.Model):
     role = db.Column(db.String(10), nullable=False, default='user')  # 'admin' or 'user'
     quizzes_taken = db.relationship('Score', backref='user', lazy=True)
 
+  
 class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
