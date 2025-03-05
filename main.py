@@ -59,13 +59,25 @@ def login():
         user = User.query.filter_by(email=email, password=password).first()
         if user:
             session['user_id'] = user.id
+           
             flash('Login successful!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('dashboard'))
         else:
             flash('Invalid email or password', 'error')
             return render_template('login.html')
     return render_template('login.html')
 
+@app.route("/dashboard")
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user= User.query.get(session['user_id'])
+    if user.role != 'admin':
+        return render_template('user_dashboard.html', current_user=user)
+    else:
+        return render_template('admin_dashboard.html', current_user=user)
+   
+    
 
 @app.route('/logout')
 def logout():

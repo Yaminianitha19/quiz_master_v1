@@ -23,6 +23,14 @@
             </div>
             <div class="navbar-nav ms-auto">
                 {% if current_user %}
+                    {% if current_user.role == 'admin' %}
+                    <!-- quiz,summary -->
+                    <a class="nav-item nav-link fs-5 mt-1" href="/quiz">Quiz</a>
+                    {% else %}
+                    <!-- score ,summary -->
+                    <a class="nav-item nav-link fs-5 mt-1" href="/score">Score</a>
+                    {% endif %}
+                    <a class="nav-item nav-link fs-5 mt-1" href="/summary">Summary</a>
                     <a class="nav-item nav-link fs-5 mt-1" href="/logout">Logout</a>
                 {% else %}
                     <a class="nav-item nav-link fs-5 mt-1" href="/login">Login</a>
