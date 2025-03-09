@@ -9,6 +9,17 @@
                     <h3 class="card-title">Admin Dashboard</h3>
                     <p>Welcome, {{ current_user.full_name }}</p>
                 </div>
+                {% if subjects %}
+                <div class="card-body">
+                    <h4 class="card-title">Subjects</h4>
+                    <ul class="list-group">
+                        {% for subject in subjects %}
+                        <li class="list-group-item">{{ subject.name }} - {{ subject.description }} <a href="/edit_subject/{{ subject.id }}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="/delete_subject/{{ subject.id }}" class="btn btn-danger btn-sm">Delete</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
             </div>
             <a href="/add_subject" class="btn btn-primary">Add Subject</a>
         </div>

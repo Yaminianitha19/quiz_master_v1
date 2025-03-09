@@ -21,13 +21,11 @@ def create_admin():
 
 @app.route('/')
 def index():
-    user_id = session.get('user_id')
-    user = User.query.get(user_id) if user_id else None
-    return render_template('index.html', current_user=user)
+    return redirect(url_for('dashboard'))
 
 @app.route('/home')
 def home():
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -73,9 +71,11 @@ def dashboard():
         return redirect(url_for('login'))
     user= User.query.get(session['user_id'])
     if user.role != 'admin':
-        return render_template('user_dashboard.html', current_user=user)
+        subjects = Subject.query.all()
+        return render_template('user_dashboard.html', current_user=user, subjects=subjects)
     else:
-        return render_template('admin_dashboard.html', current_user=user)
+        subjects = Subject.query.all()
+        return render_template('admin_dashboard.html', current_user=user, subjects=subjects)
    
     
 
@@ -99,12 +99,49 @@ def add_subject():
         description = request.form['description']
         subject = Subject(name=subject_name, description=description)
         db.session.add(subject)
-        db.session.commit()
-        flash('Subject added successfully!', 'success')
-        return redirect(url_for('admin_dashboard'))
+        try:
+            db.session.commit()
+            flash('Subject added successfully!', 'success')
+            return redirect(url_for('dashboard'))
+        except sqlite3.IntegrityError:
+            db.session.rollback()
+            flash('Subject name already exists. Please choose a different name.', 'error')
+            return render_template('add_subject.html', current_user=user)
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            flash('Failed to add subject. Please try again.', 'error')
+            return render_template('add_subject.html', current_user=user)
     return render_template('add_subject.html', current_user=user)
 
+@app.route('/edit_subject/<int:subject_id>', methods=['GET', 'POST'])
+def edit_subject(subject_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user= User.query.get(session['user_id'])
+    if user.role != 'admin':
+        return redirect(url_for('dashboard'))
+    subject = Subject.query.get(subject_id)
+    if request.method == 'POST':
+        subject.name = request.form['subject_name']
+        subject.description = request.form['description']
+        db.session.commit()
+        flash('Subject updated successfully!', 'success')
+        return redirect(url_for('dashboard'))
+    return render_template('edit_subject.html', current_user=user, subject=subject)
 
+@app.route('/delete_subject/<int:subject_id>')
+def delete_subject(subject_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user= User.query.get(session['user_id'])
+    if user.role != 'admin':
+        return redirect(url_for('dashboard'))
+    subject = Subject.query.get(subject_id)
+    db.session.delete(subject)
+    db.session.commit()
+    flash('Subject deleted successfully!', 'success')
+    return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
     with app.app_context():
