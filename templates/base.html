@@ -18,8 +18,13 @@
         </button>
         <div class="collapse navbar-collapse" id="navbar">
             <div class="navbar-nav">
-                <a class="nav-item nav-link fw-bold fs-4" href="/home">GlowStack</a>
+                <a class="nav-item nav-link fw-bold fs-4" href="/home">Quiz Master</a>
                 <a class="nav-item nav-link fs-5 mt-1" href="/home">Home</a>
+            </div>
+            <div class="ms-auto">
+                {% if current_user %}
+                    <h3 class=" text-white">Welcome {{ current_user.role }}!</h3>
+                {% endif %}
             </div>
             <div class="navbar-nav ms-auto">
                 {% if current_user %}

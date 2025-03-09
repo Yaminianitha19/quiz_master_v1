@@ -84,9 +84,26 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('index'))
 
-@app.route("/admin_dashboard")
-def admin_dashboard():
-    return render_template('admin_dashboard.html')
+
+
+
+@app.route("/add_subject", methods=['GET', 'POST'])
+def add_subject():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user= User.query.get(session['user_id'])
+    if user.role != 'admin':
+        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        subject_name = request.form['subject_name']
+        description = request.form['description']
+        subject = Subject(name=subject_name, description=description)
+        db.session.add(subject)
+        db.session.commit()
+        flash('Subject added successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+    return render_template('add_subject.html', current_user=user)
+
 
 
 if __name__ == '__main__':
