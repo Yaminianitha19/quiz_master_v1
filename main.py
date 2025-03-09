@@ -143,7 +143,25 @@ def delete_subject(subject_id):
     flash('Subject deleted successfully!', 'success')
     return redirect(url_for('dashboard'))
 
-if __name__ == '__main__':
+@app.route('/add_chapter', methods=['GET', 'POST'])
+def add_chapter():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user= User.query.get(session['user_id'])
+    if user.role != 'admin':
+        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        chapter_name = request.form['chapter_name']
+        description = request.form['description']
+        subject_id = request.form['subject_id']
+        chapter = Chapter(name=chapter_name, description=description, subject_id=subject_id)
+        db.session.add(chapter)
+        db.session.commit()
+        flash('Chapter added successfully!', 'success')
+        return redirect(url_for('dashboard'))
+    return render_template('add_chapter.html', current_user=user, subjects=Subject.query.all())
+
+if __name__ == '__main__':  
     with app.app_context():
         db.create_all()
         create_admin()

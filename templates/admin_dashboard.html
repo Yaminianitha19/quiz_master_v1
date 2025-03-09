@@ -16,9 +16,14 @@
                         {% for subject in subjects %}
                         <li class="list-group-item">{{ subject.name }} - {{ subject.description }} <a href="/edit_subject/{{ subject.id }}" class="btn btn-primary btn-sm">Edit</a>
                         <a href="/delete_subject/{{ subject.id }}" class="btn btn-danger btn-sm">Delete</a></li>
+                        <a href="/add_chapter" class="btn btn-primary">Add Chapter</a>
+                        
                         {% endfor %}
                     </ul>
+                    <!-- add chapterx    -->
                 </div>
+                {% else %}
+                <p>No subjects available.</p>
                 {% endif %}
             </div>
             <a href="/add_subject" class="btn btn-primary">Add Subject</a>
